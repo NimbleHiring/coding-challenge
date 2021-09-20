@@ -13,21 +13,21 @@ function App() {
 	const [candidates, setCandidates] = useState(CandidateData.results);
 	const [searchQuery, setSearchQuery] = useState("");
 
-	const handleSearchQuery = (e) => {
-		const input = e.target.value;
-		if (!input) {
-			return;
-		}
-		setSearchQuery(input);
-	};
+	const handleSearchQuery = (e) => setSearchQuery(e.target.value);
 
 	const filteredCandidates = candidates.filter((candidate) => {
+		if (!searchQuery) {
+			return candidate;
+		}
+
 		// Filter by name
-		if (searchQuery.includes(candidate.name.toLowerCase())) {
+		if (candidate.name.toLowerCase().includes(searchQuery.toLowerCase())) {
 			return candidate;
 		}
 		// Filter by keyword (i've just chosen email for now)
-		else if (searchQuery.includes(candidate.email.toLowerCase())) {
+		else if (
+			candidate.email.toLowerCase().includes(searchQuery.toLowerCase())
+		) {
 			return candidate;
 		}
 		return undefined;
@@ -37,10 +37,13 @@ function App() {
 		<div style={{ width: "960px", margin: "0 auto" }}>
 			<header>
 				<p>{candidates.length} Candiates</p>
-				<SearchBar searchQuery={searchQuery} />
+				<SearchBar
+					searchQuery={searchQuery}
+					handleSearchQuery={handleSearchQuery}
+				/>
 			</header>
 			<main>
-				<CandidateTable candidates={candidates} />
+				<CandidateTable candidates={filteredCandidates} />
 			</main>
 		</div>
 	);
