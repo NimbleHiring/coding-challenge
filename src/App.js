@@ -36,7 +36,7 @@ function App() {
 	return (
 		<div style={{ width: "960px", margin: "0 auto" }}>
 			<header>
-				<h2>{candidates.length} Candiates</h2>
+				<p>{candidates.length} Candiates</p>
 				<SearchBar searchQuery={searchQuery} />
 			</header>
 			<main>

@@ -1,9 +1,14 @@
 import React from "react";
 
-import { Searchbar } from "./SearchBar.styles.js";
+import "./SearchBar.styles.css";
 
 function SearchBar() {
-	return <Searchbar placeholder="Search by candidate or keyword" />;
+	return (
+		<input
+			className="search-bar"
+			placeholder="Search by candidate or keyword"
+		/>
+	);
 }
 
 export default SearchBar;

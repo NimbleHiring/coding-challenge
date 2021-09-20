@@ -1,32 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { Container, ToggleButton, AppList, AppItem } from "./Candidate.styles";
+
+import { Modal } from "../../ui-kit/index.js";
+
+import "./Candidate.styles.css";
+import { roleStatuses, colorMapping } from "../../utils/enums";
 
 import moment from "moment";
-// import { ReactComponent as MinusSign } from "../../ui-kit/icons/svg/icon-minus-with-circle.svg";
-// import { ReactComponent as PlusSign } from "../../ui-kit/icons/svg/icon-plus-with-circle.svg";
-// export { ReactComponent as RightCaret } from "../../ui-kit/icons/svg/right_caret.svg";
 
 function Candidate({ candidate }) {
-	const [isOpen, setIsOpen] = useState(false);
+	const [openAppList, setOpenAppList] = useState(false);
+	const [modal, setModal] = useState(false);
+	const [hiringStatus, setHiringStatus] = useState({});
 
-	const handleCandidateApplications = () => {
-		setIsOpen((prevState) => !prevState);
+	const getCandidateStatus = (status) => {
+		for (let key in roleStatuses) {
+			if (roleStatuses.hasOwnProperty(key)) {
+				if (roleStatuses[key] === status) {
+					setHiringStatus(roleStatuses[key]);
+				}
+			}
+		}
 	};
 
-	// const time = moment(message.createdAt).format("h:mm");
+	const handleCandidateApplications = () =>
+		setOpenAppList((prevState) => !prevState);
 
-	// Find latest hiring status
-	// const latestStatuses = candidate.applications.map(({}))
+	const openModal = () => setModal(true);
+	const closeModal = () => setModal(false);
+
+	useEffect(() => {
+		getCandidateStatus(candidate.applications[0].new_status.label);
+	}, []);
 
 	return (
-		<div>
-			<Container
-				style={{
-					display: "flex",
-					justifyContent: "space-between",
-					alignItems: "center",
-				}}
-			>
+		<>
+			<div className="container">
 				<div>
 					<input type="checkbox" />
 				</div>
@@ -34,53 +42,54 @@ function Candidate({ candidate }) {
 					<p>{candidate.name}</p>
 				</div>
 				<div>
-					<p>{candidate.applications[0].new_status.label}</p>
+					<p>
+						{} {candidate.applications[0].new_status.label}
+					</p>
 				</div>
 				<div>
 					<p>{candidate.applications.length}</p>
 				</div>
 				<div>
-					<p>{moment().fromNow(candidate.updated)}</p>
+					<p>{moment().from(candidate.updated)}</p>
 				</div>
 				<div>
-					<ToggleButton onClick={handleCandidateApplications}>
-						{isOpen ? "-" : "+"}
-					</ToggleButton>
+					<button
+						className="toggle-button"
+						onClick={handleCandidateApplications}
+					>
+						{openAppList ? "-" : "+"}
+					</button>
 				</div>
-			</Container>
+			</div>
 			{/* Candidate applications */}
-			{isOpen && (
-				<AppList
-					style={{
-						marginLeft: "20px",
-						borderLeft: "5px solid lightgrey",
-						paddingLeft: "0",
-					}}
-				>
+			{openAppList && (
+				<ul className="app-list">
 					{candidate.applications.map((app) => (
-						<AppItem
-							style={{
-								listStyleType: "none",
-								border: "1px solid lightgrey",
-								padding: "10px 0",
-								display: "flex",
-								justifyContent: "space-between",
-								alignItems: "center",
-							}}
-							key={app.id}
-						>
+						<li className="app-item" key={app.id}>
 							<div style={{ flexGrow: 1, padding: "0 10px" }}>
 								<span>{app.role.title}</span>
 							</div>
 							<div style={{ flexGrow: 1 }}>
 								<span>{app.new_status.label}</span>
 							</div>
-							<div style={{ flexShrink: 1, justifySelf: "end" }}>{" > "}</div>
-						</AppItem>
+							<div
+								onClick={openModal}
+								style={{ flexShrink: 1, justifySelf: "end" }}
+							>
+								{modal ? " ^ " : " > "}
+							</div>
+							<Modal.Modal isOpen={modal} onClose={closeModal}>
+								<Modal.Title>{app.role.title}</Modal.Title>
+								<Modal.Body>Applied Candidate: {candidate.name}</Modal.Body>
+								<Modal.Actions>
+									<button onClick={closeModal}>Close</button>
+								</Modal.Actions>
+							</Modal.Modal>
+						</li>
 					))}
-				</AppList>
+				</ul>
 			)}
-		</div>
+		</>
 	);
 }
 
